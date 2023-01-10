@@ -1,23 +1,16 @@
+import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import React, { useState,useEffect } from 'react'
 export default function Tag(props){
-    const [taglist,Setlist] = useState()
-    useEffect(()=>{
-       Taglist()
-    },[])
-    function Taglist(){
-        axios({
-            url:'/api/tags',
-            method:"GET"
-        }).then(res => {
-            // console.log(res);
-            if(res.status == 200) {
-                Setlist(res.data.tags)
-            }
-        })
+    const {data:tag} = useQuery(['tag'],()=>{
+        return   axios({
+                    url:'/api/tags',
+                    method:"GET"
+                })
     }
+    )
+    const taglist = tag?.data.tags
     function handle(value){
-        // console.log(value)
         props.click(value)
     }
     return(

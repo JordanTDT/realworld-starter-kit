@@ -2,38 +2,33 @@ import Header from '../../comment/Header/Header'
 import axios from 'axios'
 import { NavLink,useHistory } from 'react-router-dom'
 import React, { useState } from 'react'
-export default function Sign() {
+import { useQuery } from '@tanstack/react-query'
+export default function SignUp() {
     let history = useHistory()
-    const [name,setname] = useState()
+    const [name,setName] = useState()
     const [email,setEmail] = useState()
     const [pad,setPad] = useState()
-    const [meg,setmeg] = useState()
-    function SignUp(){
-        let obj ={
-            'user':{
-                'username':name,
-                'email':email,
-                'password':pad,
-            }
+    const [meg,setMeg] = useState()
+    const [stuta,setStuta] = useState(false)
+    
+    let obj ={
+        'user':{
+            'username':name,
+            'email':email,
+            'password':pad,
         }
-        axios(
+    }
+    const {data,isError,error} = useQuery(['signip',obj],()=>{
+        return  axios(
             {
                 url:'/api/users',
                 method:'POST',
                 data:obj
-            }).then(res=>{
-                if(res.status == 200 ){
-                    console.log("成功")
-                    history.push('/login')
-                }
-            }).catch(error =>{
-                console.log(error)
-                setmeg(error.message)
             })
-        
- 
-        // console.log(obj)
-    }
+    },{ enabled:stuta}
+    )
+    if(data){history.push('/login')}
+    if (isError) { setMeg(error.message)} 
     return (
         <div className="auth-page">
             <Header/>
@@ -49,7 +44,7 @@ export default function Sign() {
                         </ul>
                         <form>
                             <fieldset className="form-group">
-                            <input className="form-control form-control-lg" type="text" placeholder="Your Name" onChange={(e)=>{setname(e.target.value)}} />
+                            <input className="form-control form-control-lg" type="text" placeholder="Your Name" onChange={(e)=>{setName(e.target.value)}} />
                             </fieldset>
                             <fieldset className="form-group">
                             <input className="form-control form-control-lg" type="text" placeholder="Email" onChange={(e)=>{setEmail(e.target.value)}}  />
@@ -57,7 +52,7 @@ export default function Sign() {
                             <fieldset className="form-group">
                             <input className="form-control form-control-lg" type="password" placeholder="Password" onChange={(e)=>{setPad(e.target.value)}}/>
                             </fieldset>
-                            <button className="btn btn-lg btn-primary pull-xs-right" onClick={()=>SignUp()}>
+                            <button className="btn btn-lg btn-primary pull-xs-right" onClick={()=>setStuta(true)}>
                             Sign up
                             </button>
                         </form>

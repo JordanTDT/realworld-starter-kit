@@ -1,49 +1,37 @@
 import Header from '../../comment/Header/Header'
 import axios from 'axios'
 import React, { useState,useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 export default function Profile(){
-    const [url,setUrl] = useState()
-    const [name,setUsername] = useState()
-    const [email,setEmail] = useState()
-    const [pad,setPad] = useState()
-    const [bio, setBio] = useState()
+    const [ponseData,setResponseData] = useState()
+    const [stuta, setStuta] = useState(false)
     const [bool, setbool] = useState(true)
    //获取用户信息
-   async function getUser(){
-      let res = await axios({
-            url: '/api/user',
-            method: "GET",
-            headers: {
-                Authorization: `Token ${sessionStorage.getItem('token')}`,
-            }
-            }).then(res => {
-                if (res.status == 200) {
-                 //   console.log(res)
-                 //   console.log("123")
-                    setUsername(res.data.user.username)
-                    setEmail(res.data.user.email)
-                    setBio(res.data.user.bio)
-                    setUrl(res.data.user.image)
-                    Carticle()
-                }
-            })
-            // console.log(res)
-    }
-    function  Carticle(){
-        axios({
-            url:`/api/articles?author=${name}&limit=20&offset=0`,
+   const {data}= useQuery(['getuser'],()=>
+   { return   axios({
+                    url: '/api/user',
+                    method: "GET",
+                    headers: {
+                        Authorization: `Token ${sessionStorage.getItem('token')}`,
+                    }
+                    }).then((res)=>{
+                        setResponseData(data.data);
+                        setStuta(true)
+                    })
+
+   }
+      
+    )
+    const {res} = useQuery(['getres'],()=>{
+        return  axios({
+            url:`/api/articles?author=${ponseData.user.name}&limit=20&offset=0`,
             method:"GET",
-        }).then(res => {
-            if(res.status == 200) {
-                console.log(res.data)
-                setPad(res.data.articles)
-            }
         })
-    }
-    useEffect(() => {
-        getUser()
-    }, [])
+    },{enabled:!!stuta}
+      
+       )
+
    return(
     <div>
           <Header></Header>
@@ -52,9 +40,11 @@ export default function Profile(){
                     <div className="container">
                         <div className="row">
                             <div className="col-xs-12 col-md-10 offset-md-1">
-                                {url?<img src={url} className="user-img"></img>:<img src='..\logo512.png' className="user-img"></img>}
-                                <h4 >{name}</h4>
-                                {bio?<p>{bio}</p>:''}
+                                {ponseData &&
+                                  ponseData?<img src={ponseData.user.url} className="user-img"></img>:<img src='..\logo512.png' className="user-img"></img>}
+                                {/* <h4 >{ponseData.name}</h4> */}
+                                {ponseData && 
+                                  ponseData?<p>{ponseData.user.bio}</p>:''}
                                 <button className="btn btns-sm btn-outline-secondary action-btn">
                                     <i className="ion-plus-round"></i>
                                     &nbsp;

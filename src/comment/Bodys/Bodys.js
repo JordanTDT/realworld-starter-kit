@@ -1,6 +1,6 @@
 import { setSelectionRange } from '@testing-library/user-event/dist/utils'
 import axios from 'axios'
-import React, { useState,useEffect } from 'react'
+import React, { useState,useEffect, useCallback } from 'react'
 import Feed from '../Feed/Feed'
 import Feedclobal from '../Feeditem/Feedclobal'
 import Feeditem from '../Feeditem/Feeditem'
@@ -16,16 +16,18 @@ export default function Bodys(props){
             SetLogin(true)
         }
     },[])
-    function onClick(value){
+    const onClick= useCallback((value)=>{
         SetClass(3)
         Setvalname(value)
         getFeed(value)
+    })  
     //    console.log(value)
-    }
+    
     // 获取数据
-    async function getFeed(value){
-        let res = await
-        axios({
+    const getFeed = useCallback(
+        async (value)=>{
+         let res= await
+         axios({
             url: `/api/articles?tag=${value}&limit=20&offset=0`,
             method: "GET",
             headers: {
@@ -35,7 +37,8 @@ export default function Bodys(props){
           if (res.status == 200) {
             SetfeedList(res.data.articles)
           }
-    }
+
+    })
     return(
         <div>
             <div className="home-page">

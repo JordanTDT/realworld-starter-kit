@@ -2,6 +2,7 @@ import Header from '../../comment/Header/Header'
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useHistory, withRouter } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 
 export default function NewArticle (){
     let history =useHistory()
@@ -9,31 +10,31 @@ export default function NewArticle (){
     const [description,setDescription] = useState()
     const [body,setBody] = useState()
     const [tagList,setTag] = useState()
+    const [stuta,setStuta] = useState(false)
 
-    function Publisharticle(){
-        console.log("23")
-        let obj={
-            "article": {
-            "title": title,
-            "description": description,
-            "body": body,
-            "tagList": tagList,
-           }  
-        }
-        axios({
-            url: '/api/articles',
-            method: "POST",
-            data: obj,
-            headers: {
-              Authorization:`Token ${ sessionStorage.getItem('token')}`,
-            }
-          }).then(res => {
-            if (res.status == 200) {
-                console.log("成功")
-                history.push('/profile')
-            }
-          })
+    let obj={
+        "article": {
+        "title": title,
+        "description": description,
+        "body": body,
+        "tagList": tagList,
+       }  
     }
+    
+    const {data,isError,error} = useQuery(['publisharticle',obj],()=>{
+        return  axios(
+            {
+                url:'/api/articles',
+                method:'POST',
+                data:obj,
+                headers: {
+                    Authorization:`Token ${ sessionStorage.getItem('token')}`,
+                  }
+            })
+    },{ enabled:stuta}
+    )
+    if(data){  history.push('/profile')}
+   
     return(
         <div>
         <Header></Header>
@@ -59,7 +60,7 @@ export default function NewArticle (){
                                     }}/>
                                     <div className="tag-list"></div>
                                 </fieldset>
-                                <button className="btn btn-lg pull-xs-right btn-primary" type="button" onClick={()=>Publisharticle() }>
+                                <button className="btn btn-lg pull-xs-right btn-primary" type="button" onClick={()=>setStuta(true) }>
                                     Publish Article
                                 </button>
                             </fieldset>

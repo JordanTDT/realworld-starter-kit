@@ -3,38 +3,33 @@ import axios from 'axios'
 import { NavLink } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
 import React, { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 export default function Sign() {
     let history = useHistory()
-    const [name,setname] = useState()
     const [email,setEmail] = useState()
     const [pad,setPad] = useState()
-    const [meg,setmeg] = useState()
-    function SignIp(){
+    const [meg,setMeg] = useState()
+    const [stuta,setStuta] = useState(false)
+    
         let obj ={
             'user':{
                 'email':email,
                 'password':pad,
             }
         }
-        axios(
-            {
-                url:'/api/users/login',
-                method:'POST',
-                data:obj
-            }).then(res=>{
-                if(res.status == 200 ){
-                    console.log("成功")
-                    sessionStorage.setItem('token',res.data.user.token)
-                    history.push('/index')
-                }
-            }).catch(error =>{
-                console.log(error)
-                setmeg(error.message)
-            })
-        
- 
-        // console.log(obj)
-    }
+        const {data,isError,error} = useQuery(['signip',obj],()=>{
+            return  axios(
+                {
+                    url:'/api/users/login',
+                    method:'POST',
+                    data:obj
+                })
+        },{ enabled:stuta}
+        )
+        console.log(data)
+        if(data){ sessionStorage.setItem('token',data?.data?.user.token);history.push('/index')}
+        if (isError) { setMeg(error.message)}
+
     return (
         <div className="auth-page">
             <Header/>
@@ -52,7 +47,7 @@ export default function Sign() {
                             <fieldset className="form-group">
                             <input className="form-control form-control-lg" type="password" placeholder="Password" onChange={(e)=>{setPad(e.target.value)}}/>
                             </fieldset>
-                            <button className="btn btn-lg btn-primary pull-xs-right" onClick={()=>SignIp()}>
+                            <button className="btn btn-lg btn-primary pull-xs-right" onClick={()=>setStuta(true)}>
                             Sign up
                             </button>
                         </form>
