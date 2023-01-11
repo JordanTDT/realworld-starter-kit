@@ -18,7 +18,7 @@ export default function Header(){
       
       },{ enabled: !!token })
       let name = user?.data?.user.username
-      console.log(name)
+      // console.log(name)
     return (
         <div>
              <nav className="navbar navbar-light">
@@ -43,7 +43,7 @@ export default function Header(){
                           <NavLink to="/setting" className="nav-link">Setting</NavLink>
                         </li>
                         }
-                        { user && 
+                        { !user && 
                             <li className="nav-item">
                             <NavLink to="/login" className="nav-link">Sign in</NavLink>
                             </li> 

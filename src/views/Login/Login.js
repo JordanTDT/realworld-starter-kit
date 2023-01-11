@@ -17,7 +17,7 @@ export default function Sign() {
                 'password':pad,
             }
         }
-        const {data,isError,error} = useQuery(['signip',obj],()=>{
+        const {data,isError,error,refetch} = useQuery(['signip',obj],()=>{
             return  axios(
                 {
                     url:'/api/users/login',
@@ -27,7 +27,7 @@ export default function Sign() {
         },{ enabled:stuta}
         )
         console.log(data)
-        if(data){ sessionStorage.setItem('token',data?.data?.user.token);history.push('/index')}
+        if(data){ sessionStorage.setItem('token',data?.data?.user.token); refetch();history.push('/index')}
         if (isError) { setMeg(error.message)}
 
     return (
